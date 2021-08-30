@@ -1,0 +1,23 @@
+echo "Create vNET1"
+echo " Create Resouce group"
+az group create -l westus -n BLUE-RG
+
+echo " Create Azure Virtual Network"
+az network vnet create -g BLUE-RG -n BLUE-RG-vNET1 --address-prefixes 192.168.0.0/16 \
+--subnet-name BLUE-RG-Sunet-1 --subnet-prefix 192.168.1.0/24 -l westus
+
+
+echo " Create Azure Virtual Network"
+az network vnet create -g BLUE-RG -n BLUE-RG-vNET1 --address-prefixes 192.168.0.0/16 \
+--subnet-name BLUE-RG-Sunet-1 --subnet-prefix 192.168.1.0/24 -l westus
+
+echo " Create Azure NSG & Rules"
+az network nsg create -group BLUE-RG -n BLUE-RG-NSG1
+az network nsg rule create -group BLUE-RG --nsg-name BLUE-RG-NSG1 -n BLUE-RG-NSG1-Rule1 --priority 100 
+--source-address-prefixes "*" --source-port-ranges "*" \
+--destination-address-prefixes "*" --destination-port-ranges "*" \
+--access Allow --protocol TCp --destination "allowing all Trafffic for now"
+
+echo " Create Azure Availabity Set"
+az vm availabilty-set create --name EAST-AVSet1 -group BLUE-RG --location westus \
+--platform-fault-domain-count 3 --platform-updatedomain-count 5

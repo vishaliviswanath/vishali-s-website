@@ -1,0 +1,41 @@
+az group create -l eastus -n LB-RG
+
+az network vnet create -g LB-RG -n LB-RG-vNET1 --address-prefixes 10.15.0.0/16 \
+--subnet-name LB-RG-Subnet-1 --subnet-prefix 10.15.1.0/24 -l eastus
+
+az network vnet create -g LB-RG -n LB-RG-vNET1 --address-prefixes 10.15.0.0/16 \
+--subnet-name LB-RG-Subnet-2 --subnet-prefix 10.15.2.0/24 -l eastus
+
+az network vnet create -g LB-RG -n LB-RG-vNET1 --address-prefixes 10.15.0.0/16 \
+--subnet-name LB-RG-Subnet-3 --subnet-prefix 10.15.3.0/24 -l eastus
+
+az network nsg create  -g LB-RG -n LB-RG-NSG1 \
+az network nsg rule create -g LB-RG --nsg-name LB-RG-NSG1 --name LB-RG-NSG1-RULE1 --priority 100 \
+--source-address-prefixes '*' --source-port-ranges '*' \
+--destination-address-prefixes '*' --destination-port-ranges '*' \
+--access Allow --protocol Tcp --description "Allowing all traffic FOR NOW"
+
+az vm availability-set create --name EAST-AVSET -g LB-RG -l eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+az vm create -g LB-RG --name LB-RGTestVM1 --image UbuntuLTS --vnet-name LB-RG-vNET1 \
+--subnet LB-RG-subnet-1 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s \
+--availability-set EAST-AVSET --nsg LB-RG-NSG1
+
+
+az vm create -g LB-RG --name LB-RGTestVM2 --image UbuntuLTS --vnet-name LB-RG-vNET1 \
+--subnet LB-RG-Subnet-2 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s \
+--availability-set EAST-AVSET --nsg LB-RG-NSG1
+
+az vm create -g LB-RG --name LB-RGTestVM3 --image UbuntuLTS --vnet-name LB-RG-vNET1 \
+--subnet LB-RG-subnet-3 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s \
+--availability-set EAST-AVSET --nsg LB-RG-NSG1
+
+#!/bin/bash
+ echo "<h1>WEB-SERVER-1</h1>" >> user/share/nginx/html/index.html
+
+apt update ngnix -y
+apt install ngnix -y
+start service ngnix
+
+http://vishaliviswa.godaddysites.com/

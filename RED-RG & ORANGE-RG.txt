@@ -1,0 +1,56 @@
+echo "Create vNET1"
+echo " Create Resouce group"
+az group create -l eastus -n RED-RG
+
+echo " Create Azure Virtua Network"
+az network vnet create -resource-group RED-RG -n RED-RG-vNET1 --address-prefixes 10.1.0.0/16 \
+--subnet-name RED-RG-Sunet-1 --subnet-prefix 10.1.1.0/24 -l eastus
+
+echo " Create Azure NSG & Rules"
+az network nsg create -resource-group RED-RG -n RED-RG-NSG1
+az network nsg rule create -group RED-RG --nsg-name RED-RG-NSG1 -n RED-RG-NSG1-Rule1 --priority 100 
+--source-address-prefixes "*" --source-port-ranges "*" \
+--destination-address-prefixes "*" --destination-port-ranges "*" \
+--access Allow --protocol TCp --destination "allowing all Trafffic for now"
+
+echo " Create Azure Availability Set"
+az vm Availability-set create --name EAST-AVSet1 -resource-group RED-RG --location eastus \
+--platform-fault-domain-count 3 --platform-updatedomain-count 5
+
+echo "Create vNET1"
+echo " Create Resouce group"
+az group create -l eastus -n ORANGE-RG
+
+echo " Create Azure Virtua Network"
+az network vnet create -g ORANGE-RG -n ORANGE-RG-vNET1 --address-prefixes 172.16.1.0.0/16 \
+--subnet-name ORANGE-RG-Sunet-1 --subnet-prefix 172.16.1.0/24 -l eastus
+
+echo " Create Azure NSG & Rules"
+az network nsg create -resource-group ORANGE-RG -n ORANGE-RG-NSG1
+az network nsg rule create -group ORANGE-RG --nsg-name ORANGE-RG-NSG1 -n ORANGE-RG-NSG1-Rule1 --priority 100 
+--source-address-prefixes "*" --source-port-ranges "*" \
+--destination-address-prefixes "*" --destination-port-ranges "*" \
+--access Allow --protocol TCp --destination "allowing all Trafffic for now"
+
+echo " Create Azure Availability Set"
+az vm Availability-set create --name EAST-AVSet1 -resource-group ORANGE-RG --location eastus \
+--platform-fault-domain-count 3 --platform-updatedomain-count 5
+
+echo "Create vNET1"
+echo " Create Resouce group"
+az group create -l westus -n BLUE-RG
+
+echo " Create Azure Virtua Network"
+az network vnet create -g BLUE-RG -n BLUE-RG-vNET1 --address-prefixes 192.168.0.0/16 \
+--subnet-name BLUE-RG-Sunet-1 --subnet-prefix 192.168.1.0/24 -l westus
+
+echo " Create Azure NSG & Rules"
+az network nsg create --resource-group BLUE-RG -n BLUE-RG-NSG1
+az network nsg rule create -resource-group BLUE-RG --nsg-name BLUE-RG-NSG1 -n BLUE-RG-NSG1-Rule1 --priority 100 
+--source-address-prefixes "*" --source-port-ranges "*" \
+--destination-address-prefixes "*" --destination-port-ranges "*" \
+--access Allow --protocol TCp --destination "allowing all Trafffic for now"
+
+echo " Create Azure Availability Set"
+az vm Availability-set create --name EAST-AVSet1 -resource-group BLUE-RG --location westus \
+--platform-fault-domain-count 3 --platform-updatedomain-count 5

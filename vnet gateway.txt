@@ -1,0 +1,33 @@
+az group create -l eastus -n HUB-RG
+
+az network vnet create -g HUB-RG -n HUB-RG-vNET1 --address-prefixes 10.10.0.0/16 \
+--subnet-name HUB-RG-Subnet-1 --subnet-prefix 10.10.1.0/24 -l eastus
+
+az vm availability-set create --name EAST-AVSET1 -g HUB-RG -l eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+az network nsg create  -g HUB-RG -n HUB-RG-NSG1 \
+az network nsg rule create -g HUB-RG --nsg-name HUB-RG-NSG1 --name HUB-RG-NSG1-RULE1 --priority 100 \
+--source-address-prefixes '*' --source-port-ranges '*' \
+--destination-address-prefixes '*' --destination-port-ranges '*' \
+--access Allow --protocol Tcp --description "Allowing all traffic FOR NOW"
+
+az group create -l eastus -n spoke-RG
+az network vnet create -g spoke-RG -n spoke-RG-vNET1 --address-prefixes 172.16.0.0/16 \
+--subnet-name spoke-RG-Subnet-1 --subnet-prefix 172.16.1.0/24 -l eastus
+
+az vm availability-set create --name EAST-AVSET1 -g spoke-RG -l eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+az network nsg create  -g spoke-RG -n spoke-RG-NSG1 \
+az network nsg rule create -g spoke-RG --nsg-name spoke-RG-NSG1 --name spoke-RG-NSG1-RULE1 --priority 100 \
+--source-address-prefixes '*' --source-port-ranges '*' \
+--destination-address-prefixes '*' --destination-port-ranges '*' \
+--access Allow --protocol Tcp --description "Allowing all traffic FOR NOW"
+
+az vm create -g spoke-RG --name spoke-RGTestVM1 --image UbuntuLTS --vnet-name spoke-RG-vNET1 \
+--subnet spoke-RG-Subnet-1 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s \
+--availability-set EAST-AVSET1 --nsg spoke-RG-NSG1
+
+em=6qlphwnNwDdtrV&AbVfRP=MbN)eUV
+

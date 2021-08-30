@@ -1,0 +1,23 @@
+az group create -l eastus -n AZAD-RG
+
+az network vnet create -g AZAD-RG -n AZAD-RG-vNET1 --address-prefixes 10.1.0.0/16 \
+--subnet-name AZAD-RG-Subnet-1 --subnet-prefix 10.1.1.0/24 -l eastus
+
+az vm availability-set create --name EAST-AVSET1 -g AZAD-RG -l eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+az network nsg create  -g AZAD-RG -n AZAD-RG-NSG1 \
+az network nsg rule create -g AZAD-RG --nsg-name AZAD-RG-NSG1 --name AZAD-RG-NSG1-RULE1  --priority 100 \
+--source-address-prefixes '*' --source-port-ranges '*' \
+--destination-address-prefixes '*' --destination-port-ranges '*' \
+--access Allow --protocol Tcp --description "Allowing all traffic FOR NOW"
+
+urn="vmlabinc1613642184700:zabbix:zabbix54-centos:5.4.0"
+az vm create --resource-group  AZAD-RG --name WINVM16GB --image $urn --vnet-name AZAD-RG-vNET1 \
+--subnet AZAD-RG-Subnet-1 --admin-username testuser --admin-password "India@1234567" --size Standard_B2ms \
+--availability-set EAST-AVSET1 --nsg AZAD-RG-NSG1
+                                                     OR
+													 
+az vm create -g AZAD-RG --name AZAD-RGTestVM1 --image UbuntuLTS --vnet-name AZAD-RG-vNET1 \
+--subnet AZAD-RG-subnet-1 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s \
+--availability-set EAST-AVSET --nsg AZAD-RG-NSG1

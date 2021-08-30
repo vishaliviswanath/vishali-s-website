@@ -1,0 +1,72 @@
+
+az group create -l eastus -n RED-RG \
+az network vnet create --resource-group RED-RG --name RED-RG-vNET1 \
+--address-prefixes 10.1.0.0/16 \
+--subnet-name RED-RG-Sunet-1 --subnet-prefix 10.1.1.0/24 -l eastus
+
+echo " Network Security Group create"
+az network nsg create -g RED-RG -n RED-RG-NSG1 \
+az network nsg rule create -g RED-RG --nsg-name RED-RG-NSG1 --name RED-RG-NSG1-RULE1 --priority 100 \
+> --source-address-prefixes "*" --source-port-ranges "*" --destination-address-prefixes "*" \
+> --destination-port-ranges "*" --access Allow --protocol Tcp --description "Allowing all traffic For Now"
+
+az network nsg rule create -g RED-RG --nsg-name RED-RG-NSG1 --name RED-RG-NSG1-RULE1 --priority 100 \
+--source-address-prefixes "*" --source-port-ranges "*" --destination-address-prefixes "*" \
+--destination-port-ranges "*" --access Allow --protocol Tcp --description "Allow Internet to Web ASG on ports 80,8080."
+
+az group create -l eastus -n ORANGE-RG \
+az network vnet create -g ORANGE-RG -n ORANGE-RG-vNET1 \
+--address-prefixes 172.16.0.0/16 \
+--subnet-name ORANGE-RG-Sunet-1 --subnet-prefix 172.16.1.0/24 -l eastus
+
+echo" resource-group create"
+az group create -l westus -n BLUE-RG \
+az network vnet create -g BLUE-RG -n BLUE-RG-vNET1 \
+--address-prefixes 192.168.0.0/16 \
+--subnet-name BLUE-RG-Sunet-1 --subnet-prefix 192.168.1.0/24 -l westus
+
+echo " availability-set create"
+
+az vm availability-set create --name EAST-AVSET -g project-1 -l EASTus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+az vm availability-set create --name EAST-AVSET --resource-group RED-RG \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+az vm availability-set create --name EAST-AVSET -g ORANGE-RG -l eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5 \
+
+az vm availability-set create --name WEST-AVSET -g BLUE-RG -l westus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+echo "VM creation"
+az vm create -g RED-RG --name RED-RGTestVM2 --image UbuntuLTS --vnet-name RED-RG-vNET2 \
+--subnet RED-RG-Sunet-1 --admin-username testuser --admin-password " Capital@100" --size Standard_B1s \
+--availability-set EAST-AVSET --nsg RED-RG-NSG1
+
+az vm create --resource-group project-1 --name  project-1TestVM1 --image UbuntuLTS --vnet-name project-1-vNET1 \
+--subnet project-1-Sunet-1 --admin-username testuser --admin-password "Capital@100" --size Standard_B1s \
+--availability-set EAST-AVSET --nsg ORANGE-RG-NSG1
+
+az vm create -g AZUREB8 -n AZUREB8-TestVM1 --image UbuntuLTS --vnet-name AZUREB8-vNET1 \
+> --subnet AZUREB8-sunet-1 --admin-username testuser --password "India@1234567" --size Standard_B1s \
+> --availability-set EAST-AVSET
+
+az vm create -g ORANGE-RG -n  ORANGE-RGTestVM1 --image UbuntuLTS --vnet-name ORANGE-RG-vNET1 \
+-subnet ORANGE-RG-Subnet-1 --admin-user testuser --admin-password "Capital@100" --size Standard_B1s \
+availability-set EAST-AVSET --nsg ORANGE-RG-NSG1
+
+az vm create -g BLUE-RG --name BLUE-RGTestVM1 --image UbuntuLTS --vnet-name BLUE-RG-vNET1 \
+--subnet BLUE-RG-Sunet-1 --admin-username testuser --admin-password " Capital@100" --size Standard_B1s \
+--availability-set WEST-AVSET --nsg BLUE-RG-NSG1
+
+
+az vm create -g AZUREB8 -n AZUREB8-TestVM1 --image UbuntuLTS --vnet-name AZUREB8-vNET1 \
+> --subnet AZUREB8-sunet-1 --admin-username testuser --password "India@1234567" --size Standard_B1s \
+> --availability-set EAST-AVSET
+
+echo " Network Security Group create"
+az network nsg create -l eastus -g AZUREB8 -n AZUREB8-NSG1 \
+az network nsg rule create -g AZUREB8 --nsg-name AZUREB8-NSG1 --name AZUREB8-NSG1-RULE1 --priority 100 \
+> --source-address-prefixes "*" --source-port-ranges "*" --destination-address-prefixes "*" \
+> --destination-port-ranges "*" --access Allow --protocol Tcp --description "Allowing all traffic"

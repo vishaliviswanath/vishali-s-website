@@ -1,0 +1,60 @@
+#creatE resource group
+
+az group create -l eastus -n HUB-RG
+az group create -l eastus -n CUST1-RG
+az group create -l eastus -n CUST2-RG
+
+#CREATE VNET'S
+az network vnet create -g HUB-RG -n HUB-RG-vNET1 --address-prefixes 10.10.0.0/16 \
+--subnet-name HUB-RG-Subnet-1 --subnet-prefix 10.10.1.0/24 -l eastus
+
+az network vnet create -g CUST1-RG -n CUST1-RG-vNET1 --address-prefixes 172.16.0.0/16 \
+--subnet-name CUST1-RG-Subnet-1 --subnet-prefix 172.16.1.0/24 -l eastus
+
+az network vnet create -g CUST2-RG -n CUST2-RG-vNET1 --address-prefixes 172.17.0.0/16 \
+--subnet-name CUST2-RG-Subnet-1 --subnet-prefix 172.17.1.0/24 -l eastus
+
+
+# CREATE NSG
+az network nsg create  -g HUB-RG -n HUB-RG-NSG1 \
+az network nsg rule create -g HUB-RG --nsg-name HUB-RG-NSG1 --name HUB-RG-NSG1-RULE1 --priority 100 \
+--source-address-prefixes '*' --source-port-ranges '*' \
+--destination-address-prefixes '*' --destination-port-ranges '*' \
+--access Allow --protocol Tcp --description "Allowing all traffic FOR NOW"
+
+az network nsg create  -g CUST1-RG -n CUST1-RG-NSG1 \
+az network nsg rule create -g CUST1-RG --nsg-name CUST1-RG-NSG1 --name CUST1-RG-NSG1-RULE1 --priority 100 \
+--source-address-prefixes '*' --source-port-ranges '*' \
+--destination-address-prefixes '*' --destination-port-ranges '*' \
+--access Allow --protocol Tcp --description "Allowing all traffic"
+
+az network nsg create  -g CUST2-RG -n CUST2-RG-NSG1 \
+az network nsg rule create -g CUST2-RG --nsg-name CUST2-RG-NSG1 --name CUST2-RG-NSG1-RULE1 --priority 100 \
+--source-address-prefixes '*' --source-port-ranges '*' \
+--destination-address-prefixes '*'  --destination-port-ranges '*' \
+--access Allow --protocol Tcp --description "Allowing all traffic"
+
+# CREATE AV set
+az vm availability-set create --name EAST-AVSET -g HUB-RG -l eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+
+az vm availability-set create --name EAST-AVSET -g CUST1-RG -l eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+
+az vm availability-set create --name EAST-AVSET -g CUST2-RG -l eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+# VM CREATE
+ns1-38.azure-dns.com.
+
+az vm create -g CUST1-RG --name CUST1-RGTestVM1 --image UbuntuLTS --vnet-name CUST1-RG-vNET1 \
+--subnet CUST1-RG-Subnet-1 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s \
+--availability-set EAST-AVSET --nsg CUST1-RG-NSG1
+
+az vm create -g CUST2-RG --name CUST2-RGTestVM1 --image UbuntuLTS --vnet-name CUST2-RG-vNET1 \
+--subnet CUST2-RG-Subnet-1 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s \
+--availability-set EAST-AVSET --nsg CUST2-RG-NSG1
+
+az network vnet delete -g HUB-RG -n HUB-RG-vNET1

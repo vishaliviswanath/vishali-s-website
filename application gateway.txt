@@ -1,0 +1,39 @@
+az group create -l eastus -n APPGW-RG
+
+az network vnet create -g APPGW-RG -n APPGW-RG-vNET1 --address-prefixes 10.1.0.0/16 \
+--subnet-name APPGW-RG-Subnet-1 --subnet-prefix 10.1.1.0/24 -l eastus
+
+az network vnet create -g APPGW-RG -n APPGW-RG-vNET1 --address-prefixes 10.1.0.0/16 \
+--subnet-name APPGW-RG-Subnet-2 --subnet-prefix 10.1.2.0/24 -l eastus
+
+az network vnet create -g APPGW-RG -n APPGW-RG-vNET1 --address-prefixes 10.1.0.0/16 \
+--subnet-name APPGW-RG-Subnet-3 --subnet-prefix 10.1.3.0/24 -l eastus
+
+az vm availability-set create --name EAST-AVSET1 -g APPGW-RG -l eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+az vm availability-set create --name EAST-AVSET2 -g APPGW-RG -l eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+az vm availability-set create --name EAST-AVSET3 -g APPGW-RG -l eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+az vm create -g APPGW-RG --name APPGW-RGTestVM1 --image UbuntuLTS --vnet-name APPGW-RG-vNET1 \
+--subnet APPGW-RG-subnet-1 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s \
+--availability-set EAST-AVSET1
+
+az vm create -g APPGW-RG --name APPGW-RGTestVM2 --image UbuntuLTS --vnet-name APPGW-RG-vNET1 \
+--subnet APPGW-RG-subnet-1 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s \
+--availability-set EAST-AVSET2
+ 
+ az vm create -g APPGW-RG --name APPGW-RGTestVM3 --image UbuntuLTS --vnet-name APPGW-RG-vNET1 \
+--subnet APPGW-RG-subnet-1 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s \
+--availability-set EAST-AVSET3
+
+az network nsg create  -g APPGW-RG -n APPGW-RG-NSG1 \
+az network nsg rule create -g APPGW-RG --nsg-name APPGW-RG-NSG1 --name APPGW-RG-NSG1-RULE1 --priority 100 \
+--source-address-prefixes '*' --source-port-ranges '*' \
+--destination-address-prefixes '*' --destination-port-ranges '*' \
+--access Allow --protocol Tcp --description "Allowing all traffic FOR NOW"
+ 
+ 

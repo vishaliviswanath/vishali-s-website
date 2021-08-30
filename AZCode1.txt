@@ -1,0 +1,31 @@
+echo " Create Resouce group"
+az group create -l eastus -n project-1
+
+echo " Create Azure Virtua Network"
+az network vnet create -g project-1 -n project-1-vNET3 --address-prefixes 10.1.0.0/16 \
+--subnet-name project-1-Sunet-1 --subnet-prefix 10.1.1.0/24 -l eastus
+
+echo "Create new subnets"
+az network vnet create -g RED-RG -n RED-RG-vNET2 --address-prefixes 10.2.0.0/16 \
+--subnet-name RED-RG-Sunet-1 --subnet-prefix 10.2.1.0/24 -l westus
+
+az network vnet create -g RED-RG -n RED-RG-vNET3 --address-prefixes 10.3.0.0/16 \
+--subnet-name RED-RG-Sunet-2 --subnet-prefix 10.3.1.0/24 -l eastus
+
+echo " Create Azure NSG & Ruls "
+az network nsg create -group RED-RG -n RED-RG-NSG1
+az network nsg rule create -group RED-RG --nsg-name RED-RG-NSG1 -n RED-RG-NSG1-Rule1 --priority 100 
+--source-address-prefixes "*" --source-port-ranges "*" --destination-address-prefixes "*" \
+--destination-port-ranges "*" --access Allow --protocol TCp --destination "allowing all Trafffic for now"
+
+echo " Create Azure Availabity Set"
+az vm create --name EAST-AVSet1 -group RED-RG --location eastus \
+--platform-fault-domain-count 3 --platform-updatedomain-count 5
+
+az network vnet create -g RED-RG -n RED-RG-vNET1 --address-prefixes 10.1.0.0/16 \
+--subnet-name RED-RG-Sunet-3 \
+--subnet-prefix 10.1.3.0/24 -l eastus
+
+az network vnet create -g RED-RG -n RED-RG-vNET1 --address-prefixes 10.1.0.0/16 \
+--subnet-name RED-RG-Sunet-1 \
+--subnet-prefix 10.1.4.0/24 -l eastus

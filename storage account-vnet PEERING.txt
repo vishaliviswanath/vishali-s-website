@@ -1,0 +1,8 @@
+VNET PEERING 
+
+vnet1Id=$(az network vnet show --resource-group HUB-RG --name HUB-RG-vnet1 --query id --out tsv)
+vnet2Id=$(az network vnet show --resource-group spoke-RG --name spoke-RG-vnet1 --query id --out tsv)
+
+az network vnet peering create  -g HUB-RG -n HUB-spoke --vnet-name HUB-RG-vnet1 --remote-vnet $vnet2Id --allow-vnet-access
+
+az network vnet peering create  -g spoke-RG -n spoke-HUB --vnet-name spoke-RG-vnet1 --remote-vnet $vnet1Id    --allow-vnet-access

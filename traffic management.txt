@@ -1,0 +1,15 @@
+az group create -l eastus -n Traffic-management
+
+az network vnet create -g Traffic-management -n Traffic-management-vNET1 --address-prefixes 10.13.0.0/16 \
+--subnet-name Traffic-management-Subnet-1 --subnet-prefix 10.13.1.0/24 -l eastus
+
+az network vnet create -g Traffic-management -n Traffic-management-vNET2 --address-prefixes 10.14.0.0/16 \
+--subnet-name Traffic-management-Subnet-2 --subnet-prefix 10.14.1.0/24 -l westus
+
+az vm create -g Traffic-management --name Traffic-management-east-VM1 --image UbuntuLTS --vnet-name Traffic-management-vNET1 \
+--subnet Traffic-management-Subnet-1 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s \
+
+
+az vm create -g Traffic-management --name Traffic-management-west-VM2 --image UbuntuLTS --vnet-name Traffic-management-vNET2ns1-38.azure-dns.com.ns1-38.azure-dns.com.yes 
+you can  \
+--subnet Traffic-management-Subnet-2 --admin-username testuser --admin-password "India@1234567" --size Standard_B1s 
